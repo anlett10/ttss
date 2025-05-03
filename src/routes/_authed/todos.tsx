@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { triplitRoute } from '@triplit/tanstack';
-import { triplit } from '@/../triplit/triplitClient';
-import { type Todo } from '@/../triplit/schema';
+import { triplit } from '@/triplit/triplitClient';
+import { type Todo } from '@/triplit/schema';
 import { useCallback, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
