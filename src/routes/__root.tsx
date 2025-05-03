@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { HydrationCheck } from '@/components/HydrationCheck';
-import appCss from '../index.css?url';
+import '../index.css'
 import { createServerFn } from '@tanstack/react-start';
 import { getWebRequest } from '@tanstack/react-start/server';
 import { getAuth } from '@clerk/tanstack-react-start/server';
@@ -41,7 +41,6 @@ export const Route = createRootRoute({
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     ],
     title: 'TanStack Start Starter',
-    links: [{ rel: 'stylesheet', href: appCss }],
   }),
 
   beforeLoad: async () => {

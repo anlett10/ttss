@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { triplitRoute } from '@triplit/tanstack';
 import { triplit } from '@/triplit/triplitClient';
+import type { QueryBuilder, CollectionQuery, WithInclusion, Models } from '@triplit/client';
 import { type Todo } from '@/triplit/schema';
 import { useCallback, useState } from 'react';
 import { Input } from '@/components/ui/input';
@@ -31,8 +32,20 @@ function TodoForm({
   );
 }
 
+type TodosProps = {
+  results: Todo[];
+  error: unknown;
+  updateQuery: (
+    newQuery: QueryBuilder<
+      Models,
+      'todos',
+      WithInclusion<CollectionQuery<Models, 'todos'>, never>
+    >
+  ) => void;
+};
+
 // ✅ Main component
-function Todos({ results }: { results: Todo[] }) {
+function Todos({ results }: TodosProps) {
   const [newTodo, setNewTodo] = useState("");
 
   const handleAddTodo = useCallback(async (e: React.FormEvent) => {
@@ -102,7 +115,20 @@ function Todos({ results }: { results: Todo[] }) {
   );
 }
 
+function TodosWrapper(props: {
+  results: Record<string, any>[];
+  error: unknown;
+  updateQuery: (q: any) => void;
+}) {
+  const typedResults = props.results as Todo[];
+  return <Todos results={typedResults} error={undefined} updateQuery={function (newQuery: QueryBuilder<
+    Models, 'todos', WithInclusion<CollectionQuery<Models, 'todos'>, never>
+  >): void {
+    throw new Error('Function not implemented.');
+  } } />;
+}
+
 // ✅ Route export
 export const Route = createFileRoute('/_authed/todos')(
-  triplitRoute(triplit, () => triplit.query('todos'), Todos)
+  triplitRoute(triplit, () => triplit.query('todos'), TodosWrapper)
 );
