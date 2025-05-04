@@ -52,9 +52,15 @@ function Todos({ results }: TodosProps) {
     e.preventDefault();
     const text = newTodo.trim();
     if (!text) return;
-    await triplit.insert('todos', { text, completed: false });
+  
+    await triplit.insert('todos', {
+      text,
+      completed: false,
+      created_at: new Date().toISOString(), // ⬅️ Set timestamp
+    });
+  
     setNewTodo("");
-  }, [newTodo]);
+  }, [newTodo]);  
 
   const toggleCompleted = useCallback(async (todo: Todo) => {
     await triplit.update('todos', todo.id, { completed: !todo.completed });
@@ -85,7 +91,7 @@ function Todos({ results }: TodosProps) {
                 <li key={todo.id} className="mb-4 p-2 border rounded">
                   <div className="font-bold">{todo.text}</div>
                   <div>Status: {todo.completed ? '✅ Completed' : '❌ Not Completed'}</div>
-                  <div>Created: {new Date(todo.created_at).toLocaleString()}</div>
+                  <div>Created: {new Date(Number(todo.created_at)).toLocaleString()}</div>
                   <div className="mt-2 flex gap-2">
                     <button
                       onClick={() => toggleCompleted(todo)}
@@ -120,12 +126,18 @@ function TodosWrapper(props: {
   error: unknown;
   updateQuery: (q: any) => void;
 }) {
-  const typedResults = props.results as Todo[];
-  return <Todos results={typedResults} error={undefined} updateQuery={function (newQuery: QueryBuilder<
-    Models, 'todos', WithInclusion<CollectionQuery<Models, 'todos'>, never>
-  >): void {
-    throw new Error('Function not implemented.');
-  } } />;
+  const typedResults = props.results.map((todo: any) => ({
+    ...todo,
+    created_at: new Date(todo.created_at),
+  })) as Todo[];
+
+  return (
+    <Todos
+      results={typedResults}
+      error={props.error}
+      updateQuery={props.updateQuery}
+    />
+  );
 }
 
 // ✅ Route export
