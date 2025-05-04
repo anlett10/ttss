@@ -7,6 +7,7 @@ import { useCallback, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useUser } from '@clerk/tanstack-react-start';
 
 // ✅ Reusable form component
 function TodoForm({
@@ -47,20 +48,23 @@ type TodosProps = {
 // ✅ Main component
 function Todos({ results }: TodosProps) {
   const [newTodo, setNewTodo] = useState("");
+  const { user } = useUser();
 
   const handleAddTodo = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     const text = newTodo.trim();
-    if (!text) return;
+    if (!text || !user) return;
   
     await triplit.insert('todos', {
       text,
       completed: false,
-      created_at: new Date().toISOString(), // ⬅️ Set timestamp
+      user_id: user.id,
+      username: user.username || user.fullName || '',
+      created_at: new Date(), // optional if using default
     });
   
-    setNewTodo("");
-  }, [newTodo]);  
+    setNewTodo('');
+  }, [newTodo, user]);  
 
   const toggleCompleted = useCallback(async (todo: Todo) => {
     await triplit.update('todos', todo.id, { completed: !todo.completed });
@@ -90,6 +94,9 @@ function Todos({ results }: TodosProps) {
               {results.map((todo) => (
                 <li key={todo.id} className="mb-4 p-2 border rounded">
                   <div className="font-bold">{todo.text}</div>
+                  <div className="text-sm text-gray-600">
+                    Posted by: <span className="font-bold">{todo.username}</span>
+                  </div>
                   <div>Status: {todo.completed ? '✅ Completed' : '❌ Not Completed'}</div>
                   <div>Created: {new Date(Number(todo.created_at)).toLocaleString()}</div>
                   <div className="mt-2 flex gap-2">
